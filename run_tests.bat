@@ -7,11 +7,11 @@ pip install -r requirements.txt
 echo.
 
 echo Running UI Tests...
-pytest tests/test_ui.py -m ui -v
+pytest tests/test_ui/ -m ui -v
 echo.
 
 echo Running API Tests...
-pytest tests/test_api.py -m api -v
+pytest tests/test_api/ -m api -v
 echo.
 
 echo Running All Tests with HTML Report...

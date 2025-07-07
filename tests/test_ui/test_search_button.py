@@ -1,80 +1,72 @@
 """
-Simple UI test for search button functionality.
+UI tests for Ynet website search functionality.
 """
 
 import pytest
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from pages.home_page import HomePage
+from utils.config import load_config
+from utils.test_data import get_default_search_term
 
 
 @pytest.mark.ui
 @pytest.mark.sanity
-def test_search_button_exists(driver):
-    """Test that search button with class 'searchBtn' exists on page."""
-    # Navigate to a test page with search button
-    test_html = """
-    <html>
-        <head><title>Search Test Page</title></head>
-        <body>
-            <h1>Test Page</h1>
-            <input type="text" placeholder="Search..." />
-            <button class="searchBtn" id="search-btn">Search</button>
-        </body>
-    </html>
-    """
+def test_ynet_homepage_loads(driver):
+    """Test that Ynet homepage loads successfully."""
+    config = load_config()
+    driver.get(config["base_url"])
     
-    driver.get(f"data:text/html,{test_html}")
+    homepage = HomePage(driver)
     
-    # Wait for page to load
-    WebDriverWait(driver, 10).until(EC.title_contains("Search Test Page"))
+    # Verify page loaded correctly
+    assert homepage.verify_page_loaded(), "Ynet homepage should load successfully"
     
-    # Verify search button exists with correct class
-    try:
-        search_button = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "searchBtn"))
-        )
-        assert search_button is not None, "Search button with class 'searchBtn' should exist"
-        assert search_button.is_displayed(), "Search button should be visible"
-        assert search_button.text == "Search", "Button should contain 'Search' text"
-        
-    except TimeoutException:
-        pytest.fail("Search button with class 'searchBtn' was not found on the page")
+    # Verify title contains ynet
+    title = homepage.get_title()
+    assert "ynet" in title.lower(), "Page title should contain 'ynet'"
 
 
-@pytest.mark.ui  
+@pytest.mark.ui
+@pytest.mark.sanity  
+def test_search_functionality(driver):
+    """Test search functionality on Ynet website."""
+    config = load_config()
+    driver.get(config["base_url"])
+    
+    homepage = HomePage(driver)
+    
+    # Perform search using default search term from data file
+    search_term = get_default_search_term()
+    homepage.search(search_term)
+    
+    # Verify search term appears in page source or URL changed
+    current_url = driver.current_url
+    page_content = driver.page_source
+    
+    # Check either the search term is in content OR the URL indicates search was performed
+    search_performed = (search_term in page_content or 
+                       "search" in current_url.lower() or 
+                       search_term in current_url)
+    
+    assert search_performed, "Search should work properly"
+
+
+@pytest.mark.ui
 @pytest.mark.nightly
-def test_search_button_clickable(driver):
-    """Test that search button is clickable (nightly test)."""
-    # Navigate to a test page with interactive search button
-    test_html = """
-    <html>
-        <head><title>Interactive Search</title></head>
-        <body>
-            <h1>Interactive Test</h1>
-            <input type="text" id="search-input" placeholder="Enter search term..." />
-            <button class="searchBtn" id="search-btn" onclick="this.style.background='green'">Search</button>
-        </body>
-    </html>
-    """
+def test_ynet_basic_navigation(driver):
+    """Test basic navigation on Ynet website (nightly test)."""
+    config = load_config()
+    driver.get(config["base_url"])
     
-    driver.get(f"data:text/html,{test_html}")
+    homepage = HomePage(driver)
     
-    # Wait for page to load
-    WebDriverWait(driver, 10).until(EC.title_contains("Interactive Search"))
+    # Verify page elements exist
+    assert homepage.verify_page_loaded(), "Homepage should load"
     
-    # Find and click the search button
-    search_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "searchBtn"))
-    )
+    # Check main headline exists
+    headline = homepage.get_main_headline()
+    assert len(headline) > 0, "Should have main headline"
     
-    # Verify button is clickable
-    assert search_button.is_enabled(), "Search button should be enabled"
-    
-    # Click the button
-    search_button.click()
-    
-    # Verify click worked (button background should change to green)
-    button_style = search_button.get_attribute("style")
-    assert "green" in button_style.lower(), "Button background should change after click" 
+    # Check page title is reasonable
+    title = homepage.get_title()
+    assert len(title) > 0, "Page should have a title"
+    assert "ynet" in title.lower(), "Title should contain 'ynet'" 
