@@ -1,0 +1,11 @@
+{
+  "search_terms": {
+    "default": "חדשות",
+    "alternatives": ["ספורט", "כלכלה", "טכנולוגיה"]
+  },
+  "hebrew_content": ["חדשות", "ספורט", "כלכלה", "תרבות", "ישראל"],
+  "error_messages": {
+    "page_load": "Ynet homepage should load successfully",
+    "search_failed": "Search should work properly"
+  }
+} 
