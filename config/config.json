@@ -1,0 +1,8 @@
+{
+  "base_url": "https://www.ynet.co.il",
+  "api_base_url": "https://jsonplaceholder.typicode.com",
+  "browser": "chrome",
+  "headless": false,
+  "timeout": 10,
+  "environment": "demo"
+}

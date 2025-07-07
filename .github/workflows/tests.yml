@@ -1,0 +1,201 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Nightly run at 2:00 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  sanity-tests:
+    name: 🟢 Sanity Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run sanity tests
+      run: |
+        pytest tests/ -m sanity -v --html=reports/sanity_report.html --self-contained-html
+    
+    - name: Upload sanity report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: sanity-test-report
+        path: reports/sanity_report.html
+        retention-days: 30
+    
+    - name: Notify Slack - Sanity Success
+      if: success()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        channel: '#sanity'
+        text: |
+          ✅ *Sanity Tests PASSED*
+          
+          📊 *Details:*
+          • Repository: ${{ github.repository }}
+          • Branch: ${{ github.ref_name }}
+          • Commit: ${{ github.sha }}
+          • Author: ${{ github.actor }}
+          
+          🔗 *Links:*
+          • [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          • [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    - name: Notify Slack - Sanity Failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        channel: '#sanity'
+        text: |
+          ❌ *Sanity Tests FAILED*
+          
+          📊 *Details:*
+          • Repository: ${{ github.repository }}
+          • Branch: ${{ github.ref_name }}
+          • Commit: ${{ github.sha }}
+          • Author: ${{ github.actor }}
+          
+          🔗 *Links:*
+          • [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          • [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          ⚠️ *Action Required:* Please check the test failures immediately.
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  nightly-tests:
+    name: 🌙 Nightly Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_nightly)
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run all tests
+      run: |
+        pytest tests/ -v --html=reports/nightly_report.html --self-contained-html
+    
+    - name: Upload nightly report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: nightly-test-report
+        path: reports/nightly_report.html
+        retention-days: 30
+    
+    - name: Generate test summary
+      if: always()
+      run: |
+        echo "## 🌙 Nightly Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📅 **Date:** $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 **Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+        echo "🌿 **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 **Test Results:** Check the artifacts for detailed HTML report" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Notify Slack - Nightly Success
+      if: success()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        channel: '#nightly'
+        text: |
+          ✅ *Nightly Tests PASSED*
+          
+          📊 *Details:*
+          • Repository: ${{ github.repository }}
+          • Date: $(date)
+          • All tests completed successfully
+          
+          🔗 *Links:*
+          • [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          • [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          🎉 *Great job! All systems are healthy.*
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    - name: Notify Slack - Nightly Failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        channel: '#nightly'
+        text: |
+          ❌ *Nightly Tests FAILED*
+          
+          📊 *Details:*
+          • Repository: ${{ github.repository }}
+          • Date: $(date)
+          • Some tests failed during nightly run
+          
+          🔗 *Links:*
+          • [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          • [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          ⚠️ *Action Required:* Please investigate the failures.
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  test-on-demand:
+    name: 🎯 Manual Test Run
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run manual tests
+      run: |
+        pytest tests/ -v --html=reports/manual_report.html --self-contained-html
+    
+    - name: Upload manual report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: manual-test-report
+        path: reports/manual_report.html
+        retention-days: 7 
