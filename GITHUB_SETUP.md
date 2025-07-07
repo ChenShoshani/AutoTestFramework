@@ -40,7 +40,6 @@
 ```bash
 git remote add origin https://github.com/[USERNAME]/YitAutomationTest.git
 ```
-
 **החלף [USERNAME] עם שם המשתמש שלך בGitHub!**
 
 ### 2.2 Push לGitHub
@@ -62,15 +61,25 @@ git push -u origin main
 1. בעמוד הrepository, לחץ על **"Settings"**
 2. בתפריט השמאלי: **"Secrets and variables"** → **"Actions"**
 
-### 3.2 הוספת Slack Webhook
+### 3.2 הוספת Slack Webhooks
+צריך להוסיף **2 secrets נפרדים**:
+
+#### Secret #1: Sanity Webhook
 1. לחץ על **"New repository secret"**
-2. **Name**: `SLACK_WEBHOOK_URL`
-3. **Secret**: הדבק את הWebhook URL מSlack (מהמדריך `SLACK_SETUP.md`)
+2. **Name**: `SLACK_WEBHOOK_SANITY`
+3. **Secret**: הדבק את הWebhook URL לערוץ #sanity
 4. לחץ על **"Add secret"**
 
-### 3.3 וידוא Secret
+#### Secret #2: Nightly Webhook
+1. לחץ על **"New repository secret"**
+2. **Name**: `SLACK_WEBHOOK_NIGHTLY`
+3. **Secret**: הדבק את הWebhook URL לערוץ #nightly
+4. לחץ על **"Add secret"**
+
+### 3.3 וידוא Secrets
 אמור לראות:
-- ✅ `SLACK_WEBHOOK_URL` (Updated now)
+- ✅ `SLACK_WEBHOOK_SANITY` (Updated now)
+- ✅ `SLACK_WEBHOOK_NIGHTLY` (Updated now)
 
 ---
 
@@ -115,7 +124,8 @@ git push -u origin main
 ### 6.1 Checklist מלא
 - [ ] Repository נוצר בGitHub כprivate
 - [ ] כל הקבצים הועלו בהצלחה
-- [ ] GitHub Secret `SLACK_WEBHOOK_URL` הוגדר
+- [ ] GitHub Secret `SLACK_WEBHOOK_SANITY` הוגדר
+- [ ] GitHub Secret `SLACK_WEBHOOK_NIGHTLY` הוגדר
 - [ ] GitHub Actions workflow רץ בהצלחה
 - [ ] Sanity tests עוברים
 - [ ] דוח HTML נוצר כArtifact
@@ -177,9 +187,9 @@ git remote set-url origin https://github.com/[USERNAME]/YitAutomationTest.git
 
 ### בעיה 4: "Secret not found"
 **פתרון**:
-1. ודא שהשם הוא בדיוק `SLACK_WEBHOOK_URL`
-2. ודא שהוספת אותו לrepository הנכון
-3. ודא שהURL שלם וללא רווחים
+1. ודא שהשמות הם בדיוק `SLACK_WEBHOOK_SANITY` ו-`SLACK_WEBHOOK_NIGHTLY`
+2. ודא שהוספת אותם לrepository הנכון
+3. ודא שכל URL שלם וללא רווחים
 
 ---
 

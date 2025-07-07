@@ -45,17 +45,15 @@ jobs:
       if: success()
       run: |
         curl -X POST -H 'Content-type: application/json' --data '{
-          "text": "✅ *Sanity Tests PASSED*\n\n📊 *Details:*\n• Repository: ${{ github.repository }}\n• Branch: ${{ github.ref_name }}\n• Commit: ${{ github.sha }}\n• Author: ${{ github.actor }}\n\n🔗 *Links:*\n• [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n• [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
-          "channel": "#sanity"
-        }' ${{ secrets.SLACK_WEBHOOK_URL }}
+          "text": "✅ *Sanity Tests PASSED*\n\n📊 *Details:*\n• Repository: ${{ github.repository }}\n• Branch: ${{ github.ref_name }}\n• Commit: ${{ github.sha }}\n• Author: ${{ github.actor }}\n\n🔗 *Links:*\n• [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n• [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+        }' ${{ secrets.SLACK_WEBHOOK_SANITY }}
     
     - name: Notify Slack - Sanity Failure
       if: failure()
       run: |
         curl -X POST -H 'Content-type: application/json' --data '{
-          "text": "❌ *Sanity Tests FAILED*\n\n📊 *Details:*\n• Repository: ${{ github.repository }}\n• Branch: ${{ github.ref_name }}\n• Commit: ${{ github.sha }}\n• Author: ${{ github.actor }}\n\n🔗 *Links:*\n• [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n• [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n⚠️ *Action Required:* Please check the test failures immediately.",
-          "channel": "#sanity"
-        }' ${{ secrets.SLACK_WEBHOOK_URL }}
+          "text": "❌ *Sanity Tests FAILED*\n\n📊 *Details:*\n• Repository: ${{ github.repository }}\n• Branch: ${{ github.ref_name }}\n• Commit: ${{ github.sha }}\n• Author: ${{ github.actor }}\n\n🔗 *Links:*\n• [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n• [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n⚠️ *Action Required:* Please check the test failures immediately."
+        }' ${{ secrets.SLACK_WEBHOOK_SANITY }}
 
   nightly-tests:
     name: 🌙 Nightly Tests
@@ -102,17 +100,15 @@ jobs:
       if: success()
       run: |
         curl -X POST -H 'Content-type: application/json' --data '{
-          "text": "✅ *Nightly Tests PASSED*\n\n📊 *Details:*\n• Repository: ${{ github.repository }}\n• Date: $(date)\n• All tests completed successfully\n\n🔗 *Links:*\n• [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n• [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n🎉 *Great job! All systems are healthy.*",
-          "channel": "#nightly"
-        }' ${{ secrets.SLACK_WEBHOOK_URL }}
+          "text": "✅ *Nightly Tests PASSED*\n\n📊 *Details:*\n• Repository: ${{ github.repository }}\n• Date: $(date)\n• All tests completed successfully\n\n🔗 *Links:*\n• [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n• [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n🎉 *Great job! All systems are healthy.*"
+        }' ${{ secrets.SLACK_WEBHOOK_NIGHTLY }}
     
     - name: Notify Slack - Nightly Failure
       if: failure()
       run: |
         curl -X POST -H 'Content-type: application/json' --data '{
-          "text": "❌ *Nightly Tests FAILED*\n\n📊 *Details:*\n• Repository: ${{ github.repository }}\n• Date: $(date)\n• Some tests failed during nightly run\n\n🔗 *Links:*\n• [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n• [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n⚠️ *Action Required:* Please investigate the failures.",
-          "channel": "#nightly"
-        }' ${{ secrets.SLACK_WEBHOOK_URL }}
+          "text": "❌ *Nightly Tests FAILED*\n\n📊 *Details:*\n• Repository: ${{ github.repository }}\n• Date: $(date)\n• Some tests failed during nightly run\n\n🔗 *Links:*\n• [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n• [Download Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n⚠️ *Action Required:* Please investigate the failures."
+        }' ${{ secrets.SLACK_WEBHOOK_NIGHTLY }}
 
   test-on-demand:
     name: 🎯 Manual Test Run

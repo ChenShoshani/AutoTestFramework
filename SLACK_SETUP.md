@@ -54,15 +54,25 @@ https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
 3. בתפריט השמאלי, לחץ על **"Secrets and variables"**
 4. לחץ על **"Actions"**
 
-### 2.2 הוספת Slack Webhook
+### 2.2 הוספת Slack Webhooks
+צריך להוסיף **2 secrets נפרדים**:
+
+#### Secret #1: Sanity Tests
 1. לחץ על **"New repository secret"**
-2. בשדה **Name** הכתב: `SLACK_WEBHOOK_URL`
-3. בשדה **Secret** הדבק את ה-Webhook URL שהעתקת
+2. בשדה **Name** הכתב: `SLACK_WEBHOOK_SANITY`
+3. בשדה **Secret** הדבק את ה-Webhook URL לערוץ #sanity
 4. לחץ על **"Add secret"**
 
-### 2.3 וידוא שהSecret נוסף
+#### Secret #2: Nightly Tests
+1. לחץ על **"New repository secret"**
+2. בשדה **Name** הכתב: `SLACK_WEBHOOK_NIGHTLY`
+3. בשדה **Secret** הדבק את ה-Webhook URL לערוץ #nightly
+4. לחץ על **"Add secret"**
+
+### 2.3 וידוא שהSecrets נוספו
 אמור לראות ברשימה:
-- ✅ `SLACK_WEBHOOK_URL` (Updated X seconds ago)
+- ✅ `SLACK_WEBHOOK_SANITY` (Updated X seconds ago)
+- ✅ `SLACK_WEBHOOK_NIGHTLY` (Updated X seconds ago)
 
 ---
 
@@ -156,11 +166,11 @@ text: |
 ## 🚨 פתרון בעיות נפוצות
 
 ### בעיה 1: "Secret not found"
-**סיבה**: הSecret לא הוגדר נכון בGitHub
+**סיבה**: הSecrets לא הוגדרו נכון בGitHub
 **פתרון**: 
-1. ודא שהשם הוא בדיוק `SLACK_WEBHOOK_URL`
-2. ודא שהSecret הוגדר בrepository הנכון
-3. ודא שהWebhook URL תקין
+1. ודא שהשמות הם בדיוק `SLACK_WEBHOOK_SANITY` ו-`SLACK_WEBHOOK_NIGHTLY`
+2. ודא שהSecrets הוגדרו בrepository הנכון
+3. ודא שכל Webhook URL תקין ומתחיל ב-`https://hooks.slack.com/services/`
 
 ### בעיה 2: "Channel not found"
 **סיבה**: הערוץ לא קיים בSlack
@@ -225,9 +235,10 @@ text: |
 ## 🔄 שלב 6: אימות הגדרות
 
 ### 6.1 Checklist הגדרות
-- [ ] Slack webhook נוצר
+- [ ] 2 Slack webhooks נוצרו (אחד לכל ערוץ)
 - [ ] ערוצים `#sanity` ו-`#nightly` קיימים
-- [ ] GitHub Secret `SLACK_WEBHOOK_URL` הוגדר
+- [ ] GitHub Secret `SLACK_WEBHOOK_SANITY` הוגדר
+- [ ] GitHub Secret `SLACK_WEBHOOK_NIGHTLY` הוגדר
 - [ ] Workflow קיים ב-`.github/workflows/tests.yml`
 - [ ] Push לmain מפעיל את הworkflow
 
